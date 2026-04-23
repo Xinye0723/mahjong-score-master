@@ -233,6 +233,29 @@ function closeModal(id) {
     document.getElementById(id).style.display = 'none';
 }
 
+// 處理流局 (臭莊)
+function handleDraw() {
+    const posNames = ['東家', '南家', '西家', '北家'];
+    const dealerName = gameState.players[gameState.dealerIndex].name;
+    
+    if (confirm(`確定流局嗎？\n${dealerName} (${posNames[gameState.dealerIndex]}) 將連莊。`)) {
+        // 備份以便 Undo
+        const backup = JSON.parse(JSON.stringify(gameState));
+        
+        // 莊家連莊次數 +1
+        gameState.dealerCount++;
+        
+        // 記錄到歷史
+        gameState.history.push({
+            msg: `流局 (${dealerName} 連 ${gameState.dealerCount})`,
+            backup: backup
+        });
+        
+        saveState();
+        renderBoard();
+    }
+}
+
 // 核心計算邏輯
 function calculateScore() {
     const winnerId = parseInt(document.getElementById('winner-select').value);
@@ -240,19 +263,27 @@ function calculateScore() {
     const { base, tai } = gameState.config;
     const n = gameState.dealerCount;
     
+    // 備份狀態以便 Undo
     const backup = JSON.parse(JSON.stringify(gameState));
+    
     let logMsg = "";
     
     if (gameState.currentWinType === 'self') {
+        // 自摸
         gameState.players[winnerId].stats.selfDrawn++;
+        
         let totalWin = 0;
         gameState.players.forEach((p, idx) => {
             if (idx === winnerId) return;
+            
+            // 莊家加成 2n+1
             let extraTai = (idx === gameState.dealerIndex || winnerId === gameState.dealerIndex) ? (2 * n + 1) : 0;
             let currentPoints = base + (baseTai + extraTai) * tai;
+            
             p.score -= currentPoints;
             totalWin += currentPoints;
         });
+        
         gameState.players[winnerId].score += totalWin;
         logMsg = `${gameState.players[winnerId].name} 自摸 ${baseTai} 台`;
         if (winnerId === gameState.dealerIndex) {
@@ -263,18 +294,24 @@ function calculateScore() {
             gameState.dealerCount = 0;
         }
     } else {
+        // 胡牌
         const loserId = parseInt(document.getElementById('loser-select').value);
-        if (winnerId === loserId) return alert("贏家與輸家不能是同一人");
+        if (winnerId === loserId) {
+            alert("贏家與輸家不能是同一人");
+            return;
+        }
         
         gameState.players[winnerId].stats.win++;
         gameState.players[loserId].stats.gun++;
+        
+        // 莊家加成 2n+1
         let extraTai = (winnerId === gameState.dealerIndex || loserId === gameState.dealerIndex) ? (2 * n + 1) : 0;
         let totalPoints = base + (baseTai + extraTai) * tai;
         
         gameState.players[winnerId].score += totalPoints;
         gameState.players[loserId].score -= totalPoints;
-        logMsg = `${gameState.players[winnerId].name} 胡 ${gameState.players[loserId].name} ${baseTai} 台`;
         
+        logMsg = `${gameState.players[winnerId].name} 胡 ${gameState.players[loserId].name} ${baseTai} 台`;
         if (winnerId === gameState.dealerIndex) {
             logMsg += ` (莊連 ${n} +${2*n+1})`;
             gameState.dealerCount++;
@@ -284,15 +321,22 @@ function calculateScore() {
         }
     }
     
-    gameState.history.push({ msg: logMsg, backup: backup });
+    // 記錄到歷史
+    gameState.history.push({
+        msg: logMsg,
+        backup: backup
+    });
+    
     saveState();
     renderBoard();
     closeModal('record-modal');
 }
 
+// 顯示歷史
 function showHistory() {
     const list = document.getElementById('history-list');
     list.innerHTML = '';
+    
     if (gameState.history.length === 0) {
         list.innerHTML = '<div class="history-item">尚無紀錄</div>';
     } else {
@@ -303,11 +347,14 @@ function showHistory() {
             list.appendChild(item);
         });
     }
+    
     document.getElementById('history-modal').style.display = 'flex';
 }
 
+// 復原上一局
 function undoLast() {
     if (gameState.history.length === 0) return;
+    
     if (confirm("確定要復原上一局嗎？")) {
         const last = gameState.history.pop();
         gameState = last.backup;
@@ -317,4 +364,5 @@ function undoLast() {
     }
 }
 
+// 啟動
 init();
