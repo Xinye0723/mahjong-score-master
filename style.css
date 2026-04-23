@@ -158,6 +158,7 @@ footer {
 
 .btn-primary { background-color: var(--win-red); color: white; }
 .btn-secondary { background-color: #374151; color: white; }
+.btn-danger { background-color: #991B1B; color: white; } /* 新增危險按鈕樣式 */
 
 /* 彈窗 (Modal) */
 .modal {

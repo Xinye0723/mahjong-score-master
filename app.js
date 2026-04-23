@@ -364,5 +364,22 @@ function undoLast() {
     }
 }
 
+// 重置全賽局
+function resetGame() {
+    if (confirm("確定要重置全賽局嗎？\n這將清除所有分數、統計數據與歷史紀錄，且無法復原。")) {
+        gameState.players.forEach(p => {
+            p.score = 0;
+            p.stats = { win: 0, selfDrawn: 0, gun: 0 };
+        });
+        gameState.dealerIndex = 0;
+        gameState.dealerCount = 0;
+        gameState.history = [];
+        
+        saveState();
+        renderBoard();
+        closeModal('history-modal');
+    }
+}
+
 // 啟動
 init();

@@ -84,9 +84,12 @@
             <div id="history-list">
                 <!-- 歷史紀錄將由 JS 生成 -->
             </div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn btn-secondary" style="flex:1" onclick="undoLast()">復原上一局</button>
-                <button class="btn btn-primary" style="flex:1" onclick="closeModal('history-modal')">關閉</button>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-secondary" style="flex:1" onclick="undoLast()">復原上一局</button>
+                    <button class="btn btn-primary" style="flex:1" onclick="closeModal('history-modal')">關閉</button>
+                </div>
+                <button class="btn btn-danger" style="width:100%" onclick="resetGame()">重置全賽局</button>
             </div>
         </div>
     </div>
