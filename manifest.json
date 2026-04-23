@@ -1,0 +1,15 @@
+{
+  "name": "麻將大師",
+  "short_name": "麻將大師",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#065F46",
+  "theme_color": "#065F46",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3406/3406930.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

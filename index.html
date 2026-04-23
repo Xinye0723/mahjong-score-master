@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>麻將大師 - 南部規則記分板</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#065F46">
+</head>
+<body>
+    <header>
+        <h1>麻將大師</h1>
+        <div id="game-config-summary">底 50 / 台 20</div>
+    </header>
+
+    <main id="player-grid">
+        <!-- 玩家卡片將由 JS 生成 -->
+    </main>
+
+    <footer>
+        <button class="btn btn-secondary" onclick="showHistory()">歷史</button>
+        <button class="btn btn-primary" onclick="showRecordModal()">紀錄本局</button>
+        <button class="btn btn-secondary" onclick="showSettings()">設定</button>
+    </footer>
+
+    <!-- 設定彈窗 -->
+    <div id="setup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">開賽設定</div>
+            <div class="form-group">
+                <label>底 / 台 (點數)</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="base-input" placeholder="底" value="50">
+                    <input type="number" id="tai-input" placeholder="台" value="20">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>玩家姓名 (東/南/西/北)</label>
+                <input type="text" id="p0-name" value="玩家 1" style="margin-bottom:5px;">
+                <input type="text" id="p1-name" value="玩家 2" style="margin-bottom:5px;">
+                <input type="text" id="p2-name" value="玩家 3" style="margin-bottom:5px;">
+                <input type="text" id="p3-name" value="玩家 4">
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="saveSettings()">開始比賽</button>
+        </div>
+    </div>
+
+    <!-- 記分彈窗 -->
+    <div id="record-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">紀錄本局</div>
+            <div class="form-group">
+                <label>贏家</label>
+                <select id="winner-select" style="width:100%; padding:10px; border-radius:6px; background:#111827; color:white;"></select>
+            </div>
+            <div class="form-group">
+                <label>方式</label>
+                <div style="display:flex; gap:10px;">
+                    <button id="btn-self-draw" class="btn btn-secondary" style="flex:1" onclick="setWinType('self')">自摸</button>
+                    <button id="btn-win" class="btn btn-secondary" style="flex:1" onclick="setWinType('win')">胡牌</button>
+                </div>
+            </div>
+            <div id="loser-group" class="form-group" style="display:none;">
+                <label>放槍者</label>
+                <select id="loser-select" style="width:100%; padding:10px; border-radius:6px; background:#111827; color:white;"></select>
+            </div>
+            <div class="form-group">
+                <label>基本台數 (不含莊家台)</label>
+                <input type="number" id="tai-count-input" value="0">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-secondary" style="flex:1" onclick="closeModal('record-modal')">取消</button>
+                <button class="btn btn-primary" style="flex:1" onclick="calculateScore()">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 歷史紀錄彈窗 -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">歷史紀錄</div>
+            <div id="history-list">
+                <!-- 歷史紀錄將由 JS 生成 -->
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-secondary" style="flex:1" onclick="undoLast()">復原上一局</button>
+                <button class="btn btn-primary" style="flex:1" onclick="closeModal('history-modal')">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // PWA Service Worker 註冊
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
